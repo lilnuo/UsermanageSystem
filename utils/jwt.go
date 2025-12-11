@@ -44,7 +44,7 @@ func GenerateToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte("lanshan"))
 }
-func GeneratefreshToken(username string) (string, error) {
+func GenerateFreshToken(username string) (string, error) {
 	claims := jwt.MapClaims{
 		"username": username,
 		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
@@ -61,4 +61,15 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 		}
 		return []byte("lanshan"), nil
 	})
+}
+func ExtractClaims(token *jwt.Token) (jwt.MapClaims, error) {
+	if !token.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
+
+	return claims, nil
 }
