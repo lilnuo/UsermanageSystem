@@ -18,7 +18,7 @@ func InitRouter() {
 	{
 
 		auth.POST("/modify_password", ModifyPassword)
-		auth.GET("ping", Ping1)
+		auth.GET("/ping", Ping1)
 	}
 	log.Fatal(r.Run(":8080"))
 }

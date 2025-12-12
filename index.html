@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户系统测试</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input, button { margin: 5px; padding: 8px; }
+        #result { margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>登录</h2>
+<input type="text" id="username" placeholder="用户名">
+<input type="password" id="password" placeholder="密码">
+<button onclick="login()">登录</button>
+
+<h2>访问受保护的接口</h2>
+<button onclick="getPong()">获取 Pong</button>
+
+<div id="result"></div>
+
+<script>
+    // 全局变量存储 token
+    let userToken = '';
+
+    // 登录函数
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 登录成功，保存 token
+                userToken = data.token;
+                document.getElementById('result').innerText = '登录成功！Token已保存。';
+            } else {
+                document.getElementById('result').innerText = '登录失败: ' + data.error;
+            }
+        } catch (error) {
+            document.getElementById('result').innerText = '请求出错: ' + error;
+        }
+    }
+
+    // 获取 Pong 的函数
+    async function getPong() {
+        if (!userToken) {
+            document.getElementById('result').innerText = '请先登录！';
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/ping', {
+                method: 'GET',
+                headers: {
+                    // 关键：在这里附加上之前保存的 token
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('result').innerText = '成功获取: ' + JSON.stringify(data);
+            } else {
+                document.getElementById('result').innerText = '获取失败: ' + data.error;
+            }
+        } catch (error) {
+            document.getElementById('result').innerText = '请求出错: ' + error;
+        }
+    }
+</script>
+
+</body>
+</html>

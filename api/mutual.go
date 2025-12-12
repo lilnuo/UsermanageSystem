@@ -124,7 +124,7 @@ func RefreshToken(c *gin.Context) {
 		})
 		return
 	}
-	newToken, err := utils.GenerateToken(username)
+	newToken, err := utils.GenerateFreshToken(username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "internal server error",
